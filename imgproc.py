@@ -1,23 +1,20 @@
-"""
-Copyright (c) 2019-present NAVER Corp.
-MIT License
-"""
-
 # -*- coding: utf-8 -*-
 import numpy as np
-from skimage import io
+from PIL import Image
 import cv2
 
 def loadImage(img_file):
     try:
-        img = io.imread(img_file)           # RGB order
-        if img.shape[0] == 2:
-            img = img[0]
-        if len(img.shape) == 2:
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-        if img.shape[2] == 4:
-            img = img[:,:,:3]
-        img = np.array(img)
+        # Load image using PIL
+        with Image.open(img_file) as img:
+            img = img.convert('RGB')  # Ensure image is in RGB format
+            img = np.array(img)
+            
+            if img.ndim == 2:
+                img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+            elif img.shape[2] == 4:
+                img = img[:, :, :3]  # Drop alpha channel
+            
     except Exception as e:
         raise RuntimeError(f"Error loading image {img_file}: {e}")
 
@@ -25,7 +22,6 @@ def loadImage(img_file):
 
 def normalizeMeanVariance(in_img, mean=(0.485, 0.456, 0.406), variance=(0.229, 0.224, 0.225)):
     try:
-        # Should be RGB order
         img = in_img.copy().astype(np.float32)
 
         img -= np.array([mean[0] * 255.0, mean[1] * 255.0, mean[2] * 255.0], dtype=np.float32)
@@ -37,7 +33,6 @@ def normalizeMeanVariance(in_img, mean=(0.485, 0.456, 0.406), variance=(0.229, 0
 
 def denormalizeMeanVariance(in_img, mean=(0.485, 0.456, 0.406), variance=(0.229, 0.224, 0.225)):
     try:
-        # Should be RGB order
         img = in_img.copy()
         img *= variance
         img += mean
