@@ -103,9 +103,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
     # coordinate adjustment
     boxes = craft_utils.adjustResultCoordinates(boxes, ratio_w, ratio_h)
     polys = craft_utils.adjustResultCoordinates(polys, ratio_w, ratio_h)
-    for i in boxes:
-        print(i)
-        break
         
     for k in range(len(polys)):
         if polys[k] is None: polys[k] = boxes[k]
