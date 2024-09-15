@@ -182,5 +182,4 @@ if __name__ == '__main__':
             pickle.dump(box_data, f)
         
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
-    print("len of boxes:  ",len(box_len))
     print("elapsed time : {}s".format(time.time() - t))
