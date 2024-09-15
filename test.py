@@ -15,7 +15,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 from PIL import Image
-
+import pickle
 import cv2
 from skimage import io
 import numpy as np
