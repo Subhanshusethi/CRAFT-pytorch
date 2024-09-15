@@ -162,16 +162,19 @@ if __name__ == '__main__':
     box_len = []
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
-        print(f"Bounding boxes for {image_path}: {bboxes}")
+        # print(f"Bounding boxes for {image_path}: {bboxes}")
         image = imgproc.loadImage(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        print(f"yeh hai pathhhh{bboxes}{image_path}")
+        # print(f"yeh hai pathhhh{bboxes}{image_path}")
         # save score text
+        box_len.append(bboxes)
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
-        box_len.append(bboxes)
+        with open(result_folder + '/bbox_list.pkl', 'wb') as f:
+            pickle.dump(box_len, f)
+        
 
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
     print("len of boxes:  ",len(box_len))
