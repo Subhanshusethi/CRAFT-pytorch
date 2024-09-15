@@ -63,6 +63,10 @@ args = parser.parse_args()
 image_list, _, _ = file_utils.get_files(args.test_folder)
 
 result_folder = './result/'
+picklefiles = './pickle'
+if not os.path.isdir(picklefiles):
+    os.mkdir(picklefiles)
+
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
 
@@ -174,7 +178,7 @@ if __name__ == '__main__':
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         # mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
-        with open(result_folder + '/bbox_list.pkl', 'wb') as f:
+        with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
             pickle.dump(box_data, f)
         
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
