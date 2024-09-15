@@ -172,7 +172,7 @@ if __name__ == '__main__':
             'bboxes': bboxes
         })
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        mask_file = result_folder + "/res_" + filename + '_mask.jpg'
+        # mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
         with open(result_folder + '/bbox_list.pkl', 'wb') as f:
             pickle.dump(box_data, f)
