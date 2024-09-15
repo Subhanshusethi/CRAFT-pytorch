@@ -159,6 +159,7 @@ if __name__ == '__main__':
     t = time.time()
 
     # load data
+    box_len = []
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
         image = imgproc.loadImage(image_path)
@@ -169,7 +170,8 @@ if __name__ == '__main__':
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
+        box_len.append(bboxes)
 
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
-
+    print("len of boxes:  ",len(box_len))
     print("elapsed time : {}s".format(time.time() - t))
