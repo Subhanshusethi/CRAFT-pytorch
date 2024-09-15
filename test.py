@@ -178,7 +178,7 @@ if __name__ == '__main__':
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
         with open(result_folder + '/bbox_list.pkl', 'wb') as f:
-            pickle.dump(bbox_data, f)
+            pickle.dump(box_data, f)
         
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
     print("len of boxes:  ",len(box_len))
