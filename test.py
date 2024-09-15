@@ -164,7 +164,7 @@ if __name__ == '__main__':
         image = imgproc.loadImage(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        print(bboxes)
+        # print(bboxes)
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
