@@ -159,7 +159,7 @@ if __name__ == '__main__':
     t = time.time()
 
     # load data
-    box_len = []
+    box_data = []
     for k, image_path in enumerate(image_list):
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
         # print(f"Bounding boxes for {image_path}: {bboxes}")
@@ -168,14 +168,18 @@ if __name__ == '__main__':
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
         # print(f"yeh hai pathhhh{bboxes}{image_path}")
         # save score text
-        box_len.append(bboxes)
+        # box_len.append(bboxes)
+        file_name = os.path.basename(image_path)
+        box_data.append({
+            'file_name': file_name,
+            'bboxes': bboxes
+        })
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         # cv2.imwrite(mask_file, score_text)
         with open(result_folder + '/bbox_list.pkl', 'wb') as f:
-            pickle.dump(box_len, f)
+            pickle.dump(bbox_data, f)
         
-
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
     print("len of boxes:  ",len(box_len))
     print("elapsed time : {}s".format(time.time() - t))
