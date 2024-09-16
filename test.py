@@ -255,8 +255,8 @@ if __name__ == '__main__':
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 
     # Save bounding boxes to pickle file after processing all images
-    with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
-        pickle.dump(box_data, f)
+        with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
+            pickle.dump(box_data, f)
 
     print("Elapsed time : {}s".format(time.time() - t))
 
