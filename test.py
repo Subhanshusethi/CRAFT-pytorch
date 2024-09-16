@@ -122,70 +122,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     return boxes, polys, ret_score_text
 
-# if __name__ == '__main__':
-#     # Load net
-#     net = CRAFT()  # Initialize
-
-#     print('Loading weights from checkpoint (' + args.trained_model + ')')
-#     if args.cuda:
-#         net.load_state_dict(copyStateDict(torch.load(args.trained_model)))
-#     else:
-#         net.load_state_dict(copyStateDict(torch.load(args.trained_model, map_location='cpu')))
-
-#     if args.cuda:
-#         net = net.cuda()
-#         net = torch.nn.DataParallel(net)
-#         cudnn.benchmark = False
-
-#     net.eval()
-
-#     # Link Refiner
-#     refine_net = None
-#     if args.refine:
-#         from refinenet import RefineNet
-#         refine_net = RefineNet()
-#         print('Loading weights of refiner from checkpoint (' + args.refiner_model + ')')
-#         if args.cuda:
-#             refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model)))
-#             refine_net = refine_net.cuda()
-#             refine_net = torch.nn.DataParallel(refine_net)
-#         else:
-#             refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model, map_location='cpu')))
-
-#         refine_net.eval()
-#         args.poly = True
-
-#     t = time.time()
-
-#     # Load data
-#     box_data = []
-#     image_list, _, _ = file_utils.get_files(args.test_folder)
-    
-#     for k, image_path in enumerate(image_list):
-#         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
-        
-#         try:
-#             image = imgproc.loadImage(image_path)
-#         except (OSError, ValueError) as e:
-#             print(f"Error loading image {image_path}: {e}")
-#             continue
-
-#         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        
-#         file_name = os.path.basename(image_path)
-#         box_data.append({
-#             'file_name': file_name,
-#             'bboxes': bboxes
-#         })
-
-#         # Save results
-#         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
-
-#     # Save bounding boxes to pickle file after processing all images
-#     with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
-#         pickle.dump(box_data, f)
-
-#     print("Elapsed time : {}s".format(time.time() - t))
 if __name__ == '__main__':
     # Load net
     net = CRAFT()  # Initialize
@@ -226,18 +162,23 @@ if __name__ == '__main__':
     image_list, _, _ = file_utils.get_files(args.test_folder)
 
     # List of filenames to skip
-    skip_files = ['410+-FsVe-L.jpg', '311PssCBQIL.jpg','311e8av9T8L.jpg','51q6DNtF9sL.jpg','41-UpuYc8mL.jpg','41--Lur7UYL.jpg','41BXCQpIpxL.jpg']
-    
+    skip_files = ['410+-FsVe-L.jpg', '311PssCBQIL.jpg', '311e8av9T8L.jpg', '51q6DNtF9sL.jpg', '41-UpuYc8mL.jpg', '41--Lur7UYL.jpg', '41BXCQpIpxL.jpg']
+
+    # Initialize counters for batch saving
+    batch_size = 10000  # Save after every 10000 images
+    batch_count = 0
+    batch_index = 1  # To create unique filenames for each batch
+
     for k, image_path in enumerate(image_list):
         file_name = os.path.basename(image_path)
-        
+
         # Check if the filename is in the skip list
         if any(file_name.endswith(f) for f in skip_files):
             print(f"Skipping file: {file_name}")
             continue
-        
+
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\r')
-        
+
         try:
             image = imgproc.loadImage(image_path)
         except (OSError, ValueError) as e:
@@ -245,18 +186,32 @@ if __name__ == '__main__':
             continue
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
-        
+
         box_data.append({
             'file_name': file_name,
             'bboxes': bboxes
         })
 
-        # Save results
-        # file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
+        # Increment batch count and check if it's time to save
+        batch_count += 1
 
-    # Save bounding boxes to pickle file after processing all images
-    with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
-        pickle.dump(box_data, f)
+        if batch_count == batch_size:
+            # Save the pickle file for the current batch
+            pickle_file_path = os.path.join(picklefiles, f'bbox_list_batch_{batch_index}.pkl')
+            with open(pickle_file_path, 'wb') as f:
+                pickle.dump(box_data, f)
+            print(f"Saved batch {batch_index} to {pickle_file_path}")
+
+            # Reset batch
+            box_data = []
+            batch_count = 0
+            batch_index += 1
+
+    # Save any remaining data after the loop completes
+    if box_data:
+        pickle_file_path = os.path.join(picklefiles, f'bbox_list_batch_{batch_index}.pkl')
+        with open(pickle_file_path, 'wb') as f:
+            pickle.dump(box_data, f)
+        print(f"Saved final batch {batch_index} to {pickle_file_path}")
 
     print("Elapsed time : {}s".format(time.time() - t))
-
