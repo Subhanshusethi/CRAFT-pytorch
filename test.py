@@ -252,7 +252,7 @@ if __name__ == '__main__':
         })
 
         # Save results
-        file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
+        # file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 
     # Save bounding boxes to pickle file after processing all images
     with open(picklefiles + '/bbox_list.pkl', 'wb') as f:
